@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Copy, Check } from "lucide-react";
 
 interface Match {
   value: string;
@@ -10,41 +9,49 @@ interface Match {
   groups: { [key: string]: string } | undefined;
 }
 
-function getRailroadNodes(pattern: string) {
-  const nodes: { type: string; value: string; color: string }[] = [];
+const TOKEN_COLORS: Record<string, { bg: string; label: string }> = {
+  class:   { bg: "#534AB7", label: "文字クラス []" },
+  group:   { bg: "#BA7517", label: "グループ ()" },
+  escape:  { bg: "#0F6E56", label: "エスケープ \\" },
+  any:     { bg: "#D85A30", label: "任意 ." },
+  anchor:  { bg: "#185FA5", label: "アンカー ^$" },
+  or:      { bg: "#888780", label: "OR |" },
+  literal: { bg: "#3C3489", label: "文字" },
+};
+
+const SAMPLES = [
+  { label: "メールアドレス", pattern: "[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}", flags: "g", test: "hello@example.com, test@foo.org" },
+  { label: "ひらがな", pattern: "[\\u3041-\\u3096]+", flags: "g", test: "あいうえお、Hello、かきくけこ" },
+  { label: "郵便番号", pattern: "\\d{3}-\\d{4}", flags: "g", test: "東京 150-0001、大阪 530-0001" },
+];
+
+function tokenize(pattern: string) {
+  const nodes: { type: string; value: string }[] = [];
   let i = 0;
   while (i < pattern.length) {
     const ch = pattern[i];
     if (ch === "[") {
       const end = pattern.indexOf("]", i);
-      const value = pattern.slice(i, end + 1);
-      nodes.push({ type: "class", value, color: "#6366f1" });
-      i = end + 1;
-    } else if (ch === "(" ) {
+      if (end === -1) { nodes.push({ type: "literal", value: ch }); i++; continue; }
+      nodes.push({ type: "class", value: pattern.slice(i, end + 1) }); i = end + 1;
+    } else if (ch === "(") {
       const end = pattern.indexOf(")", i);
-      const value = pattern.slice(i, end + 1);
-      nodes.push({ type: "group", value, color: "#f59e0b" });
-      i = end + 1;
+      if (end === -1) { nodes.push({ type: "literal", value: ch }); i++; continue; }
+      nodes.push({ type: "group", value: pattern.slice(i, end + 1) }); i = end + 1;
     } else if (ch === "\\") {
-      const value = pattern.slice(i, i + 2);
-      nodes.push({ type: "escape", value, color: "#10b981" });
-      i += 2;
+      nodes.push({ type: "escape", value: pattern.slice(i, i + 2) }); i += 2;
     } else if ("*+?{}".includes(ch)) {
-      if (nodes.length > 0) {
-        nodes[nodes.length - 1].value += ch;
-      }
+      if (nodes.length > 0) nodes[nodes.length - 1].value += ch;
       i++;
     } else if (ch === ".") {
-      nodes.push({ type: "any", value: ".", color: "#ef4444" });
-      i++;
+      nodes.push({ type: "any", value: "." }); i++;
     } else if (ch === "^" || ch === "$") {
-      nodes.push({ type: "anchor", value: ch, color: "#8b5cf6" });
-      i++;
+      nodes.push({ type: "anchor", value: ch }); i++;
     } else if (ch === "|") {
-      nodes.push({ type: "or", value: "|", color: "#64748b" });
-      i++;
+      nodes.push({ type: "or", value: "|" }); i++;
     } else {
-      nodes.push({ type: "literal", value: ch, color: "#0ea5e9" });
+      const last = nodes[nodes.length - 1];
+      if (last?.type === "literal") { last.value += ch; } else { nodes.push({ type: "literal", value: ch }); }
       i++;
     }
   }
@@ -52,43 +59,40 @@ function getRailroadNodes(pattern: string) {
 }
 
 function RailroadDiagram({ pattern }: { pattern: string }) {
-  if (!pattern) return null;
-  const nodes = getRailroadNodes(pattern);
-
+  if (!pattern) return (
+    <div style={{ padding: "24px 0", textAlign: "center", color: "#9ca3af", fontSize: 13 }}>
+      正規表現を入力すると鉄道図が表示されます
+    </div>
+  );
+  const nodes = tokenize(pattern);
   return (
-    <div className="overflow-x-auto py-4">
-      <div className="flex items-center gap-0 min-w-max">
-        <div className="w-8 h-0.5 bg-gray-400" />
-        <div className="flex items-center border-2 border-gray-300 rounded px-2 py-1 text-xs text-gray-500">START</div>
-        <div className="w-4 h-0.5 bg-gray-400" />
-        {nodes.map((node, i) => (
-          <div key={i} className="flex items-center">
-            <div
-              className="border-2 rounded-lg px-3 py-2 text-sm font-mono font-bold text-white min-w-[2rem] text-center"
-              style={{ backgroundColor: node.color, borderColor: node.color }}
-              title={node.type}
-            >
-              {node.value}
-            </div>
-            {i < nodes.length - 1 && <div className="w-4 h-0.5 bg-gray-400" />}
-          </div>
-        ))}
-        <div className="w-4 h-0.5 bg-gray-400" />
-        <div className="flex items-center border-2 border-gray-300 rounded px-2 py-1 text-xs text-gray-500">END</div>
-        <div className="w-8 h-0.5 bg-gray-400" />
+    <div>
+      <div style={{ overflowX: "auto", paddingBottom: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", minWidth: "max-content", padding: "12px 0" }}>
+          <div style={{ width: 20, height: 2, background: "#d1d5db" }} />
+          <div style={{ border: "1px solid #d1d5db", borderRadius: 4, padding: "3px 8px", fontSize: 10, color: "#9ca3af", letterSpacing: "0.05em" }}>START</div>
+          <div style={{ width: 12, height: 2, background: "#d1d5db" }} />
+          {nodes.map((node, i) => {
+            const col = TOKEN_COLORS[node.type] ?? TOKEN_COLORS.literal;
+            return (
+              <div key={i} style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ background: col.bg, borderRadius: 6, padding: "5px 10px", fontSize: 12, fontFamily: "monospace", fontWeight: 600, color: "#fff", whiteSpace: "nowrap" }}>
+                  {node.value}
+                </div>
+                {i < nodes.length - 1 && <div style={{ width: 12, height: 2, background: "#d1d5db" }} />}
+              </div>
+            );
+          })}
+          <div style={{ width: 12, height: 2, background: "#d1d5db" }} />
+          <div style={{ border: "1px solid #d1d5db", borderRadius: 4, padding: "3px 8px", fontSize: 10, color: "#9ca3af", letterSpacing: "0.05em" }}>END</div>
+          <div style={{ width: 20, height: 2, background: "#d1d5db" }} />
+        </div>
       </div>
-      <div className="flex gap-4 mt-3 flex-wrap">
-        {[
-          { color: "#0ea5e9", label: "文字" },
-          { color: "#6366f1", label: "文字クラス []" },
-          { color: "#10b981", label: "エスケープ \\" },
-          { color: "#f59e0b", label: "グループ ()" },
-          { color: "#ef4444", label: "任意 ." },
-          { color: "#8b5cf6", label: "アンカー ^$" },
-        ].map((item) => (
-          <div key={item.label} className="flex items-center gap-1 text-xs text-gray-500">
-            <div className="w-3 h-3 rounded" style={{ backgroundColor: item.color }} />
-            {item.label}
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", paddingTop: 10, borderTop: "1px solid #f3f4f6" }}>
+        {Object.entries(TOKEN_COLORS).map(([, v]) => (
+          <div key={v.label} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#6b7280" }}>
+            <div style={{ width: 8, height: 8, borderRadius: 2, background: v.bg, flexShrink: 0 }} />
+            {v.label}
           </div>
         ))}
       </div>
@@ -97,231 +101,271 @@ function RailroadDiagram({ pattern }: { pattern: string }) {
 }
 
 function HighlightedText({ text, matches }: { text: string; matches: Match[] }) {
-  if (matches.length === 0) return <span>{text}</span>;
-
-  const parts: { text: string; isMatch: boolean; matchIndex: number }[] = [];
-  let lastIndex = 0;
-
-  matches.forEach((match, i) => {
-    if (match.index > lastIndex) {
-      parts.push({ text: text.slice(lastIndex, match.index), isMatch: false, matchIndex: -1 });
-    }
-    parts.push({ text: match.value, isMatch: true, matchIndex: i });
-    lastIndex = match.end;
+  const COLORS = ["#bfdbfe", "#bbf7d0", "#fef08a", "#fecaca", "#e9d5ff", "#fed7aa"];
+  if (!matches.length) return (
+    <span style={{ fontFamily: "monospace", fontSize: 13, whiteSpace: "pre-wrap", color: "#374151" }}>{text}</span>
+  );
+  const parts: { text: string; isMatch: boolean; idx: number }[] = [];
+  let last = 0;
+  matches.forEach((m, i) => {
+    if (m.index > last) parts.push({ text: text.slice(last, m.index), isMatch: false, idx: -1 });
+    parts.push({ text: m.value, isMatch: true, idx: i });
+    last = m.end;
   });
-
-  if (lastIndex < text.length) {
-    parts.push({ text: text.slice(lastIndex), isMatch: false, matchIndex: -1 });
-  }
-
-  const colors = ["#fef08a", "#bbf7d0", "#bfdbfe", "#fecaca", "#e9d5ff", "#fed7aa"];
-
+  if (last < text.length) parts.push({ text: text.slice(last), isMatch: false, idx: -1 });
   return (
-    <>
-      {parts.map((part, i) =>
-        part.isMatch ? (
-          <mark
-            key={i}
-            style={{ backgroundColor: colors[part.matchIndex % colors.length] }}
-            className="rounded px-0.5"
-          >
-            {part.text}
-          </mark>
-        ) : (
-          <span key={i}>{part.text}</span>
-        )
+    <span style={{ fontFamily: "monospace", fontSize: 13, whiteSpace: "pre-wrap", color: "#374151" }}>
+      {parts.map((p, i) =>
+        p.isMatch
+          ? <mark key={i} style={{ background: COLORS[p.idx % COLORS.length], borderRadius: 3, padding: "0 2px", color: "#111827" }}>{p.text}</mark>
+          : <span key={i}>{p.text}</span>
       )}
-    </>
+    </span>
   );
 }
+
+const CODE: Record<string, (p: string, f: string) => string> = {
+  javascript: (p, f) => `const regex = /${p || "pattern"}/${f};\nconst matches = text.match(regex);`,
+  python:     (p, f) => `import re\npattern = re.compile(r'${p || "pattern"}'${f.includes("i") ? ", re.IGNORECASE" : ""})\nmatches = pattern.findall(text)`,
+  go:         (p)    => `import "regexp"\nre := regexp.MustCompile(\`${p || "pattern"}\`)\nmatches := re.FindAllString(text, -1)`,
+};
 
 export default function RegexVisualizer() {
   const [pattern, setPattern] = useState("");
   const [flags, setFlags] = useState("g");
-  const [testString, setTestString] = useState("テキストを入力してください。\nHello World 123");
+  const [testStr, setTestStr] = useState("今日はいい天気ですね。あいうえお\nHello World 123");
   const [flavor, setFlavor] = useState("javascript");
+  const [tab, setTab] = useState<"diagram" | "matches">("diagram");
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<"diagram" | "matches">("diagram");
 
-  const getMatches = useCallback((): { matches: Match[]; error: string | null } => {
+  const { matches, error } = useCallback((): { matches: Match[]; error: string | null } => {
     if (!pattern) return { matches: [], error: null };
     try {
-      const regex = new RegExp(pattern, flags);
       const matches: Match[] = [];
       if (flags.includes("g")) {
-        let m;
         const r = new RegExp(pattern, flags);
-        while ((m = r.exec(testString)) !== null) {
+        let m;
+        while ((m = r.exec(testStr)) !== null) {
           matches.push({ value: m[0], index: m.index, end: m.index + m[0].length, groups: m.groups });
           if (m[0].length === 0) r.lastIndex++;
         }
       } else {
-        const m = regex.exec(testString);
+        const m = new RegExp(pattern, flags).exec(testStr);
         if (m) matches.push({ value: m[0], index: m.index, end: m.index + m[0].length, groups: m.groups });
       }
       return { matches, error: null };
-    } catch (e) {
-      return { matches: [], error: (e as Error).message };
-    }
-  }, [pattern, flags, testString]);
-
-  const { matches, error } = getMatches();
+    } catch (e) { return { matches: [], error: (e as Error).message }; }
+  }, [pattern, flags, testStr])();
 
   const shareUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/?pattern=${encodeURIComponent(pattern)}&flags=${flags}&test=${encodeURIComponent(testString)}`
+    ? `${window.location.origin}/?pattern=${encodeURIComponent(pattern)}&flags=${flags}&test=${encodeURIComponent(testStr)}`
     : "";
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const codeSnippets: Record<string, string> = {
-    javascript: `const regex = /${pattern || "your-pattern"}/${flags};\nconst matches = text.match(regex);`,
-    python: `import re\npattern = re.compile(r'${pattern || "your-pattern"}'${flags.includes("i") ? ", re.IGNORECASE" : ""})\nmatches = pattern.findall(text)`,
-    go: `import "regexp"\nre := regexp.MustCompile(\`${pattern || "your-pattern"}\`)\nmatches := re.FindAllString(text, -1)`,
-  };
+  const toggleFlag = (f: string) => setFlags(prev => prev.includes(f) ? prev.replace(f, "") : prev + f);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ヘッダー */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl font-bold text-blue-600">Revis</span>
-          <span className="text-sm text-gray-400">Regex Visualizer</span>
+    <div style={{ minHeight: "100vh", background: "#f9fafb", fontFamily: "system-ui, -apple-system, sans-serif" }}>
+
+      {/* ── ヘッダー ── */}
+      <header style={{
+        background: "#ffffff", borderBottom: "1px solid #e5e7eb",
+        padding: "0 24px", height: 52,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 16, fontWeight: 600, color: "#185FA5" }}>Revis</span>
+          <span style={{ width: 1, height: 14, background: "#e5e7eb", display: "inline-block" }} />
+          {pattern ? (
+            <span style={{ fontFamily: "monospace", fontSize: 12, color: "#6b7280" }}>
+              /{pattern}/{flags}
+              {matches.length > 0 && (
+                <span style={{ marginLeft: 8, color: "#166534", background: "#dcfce7", padding: "1px 8px", borderRadius: 10, fontSize: 11, fontFamily: "system-ui" }}>
+                  {matches.length} match{matches.length > 1 ? "es" : ""}
+                </span>
+              )}
+              {error && (
+                <span style={{ marginLeft: 8, color: "#991b1b", background: "#fee2e2", padding: "1px 8px", borderRadius: 10, fontSize: 11, fontFamily: "system-ui" }}>
+                  error
+                </span>
+              )}
+            </span>
+          ) : (
+            <span style={{ fontSize: 12, color: "#9ca3af" }}>regex visualizer</span>
+          )}
         </div>
-        <a href="/snippets" className="text-sm text-blue-600 hover:underline">スニペット集 →</a>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {["javascript", "python", "go"].map(f => (
+            <button key={f} onClick={() => setFlavor(f)} style={{
+              fontSize: 12, padding: "4px 10px", borderRadius: 6, cursor: "pointer",
+              border: `1px solid ${flavor === f ? "#185FA5" : "#e5e7eb"}`,
+              background: flavor === f ? "#eff6ff" : "#ffffff",
+              color: flavor === f ? "#185FA5" : "#6b7280",
+            }}>{f}</button>
+          ))}
+          <span style={{ width: 1, height: 14, background: "#e5e7eb", display: "inline-block", margin: "0 4px" }} />
+          <a href="/snippets" style={{ fontSize: 12, color: "#6b7280", textDecoration: "none" }}>スニペット →</a>
+        </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 py-6 space-y-4">
-        {/* 正規表現入力 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-gray-400 font-mono text-xl">/</span>
+      <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px" }}>
+
+        {/* ── 正規表現入力 ── */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8,
+            background: "#ffffff",
+            border: `2px solid ${error ? "#ef4444" : "#185FA5"}`,
+            borderRadius: 10, padding: "10px 16px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+          }}>
+            <span style={{ fontFamily: "monospace", fontSize: 22, color: "#9ca3af" }}>/</span>
             <input
-              type="text"
               value={pattern}
-              onChange={(e) => setPattern(e.target.value)}
+              onChange={e => setPattern(e.target.value)}
               placeholder="正規表現を入力..."
-              className={`flex-1 font-mono text-lg outline-none ${error ? "text-red-500" : "text-gray-900"}`}
+              style={{
+                flex: 1, fontFamily: "monospace", fontSize: 18,
+                border: "none", outline: "none", background: "transparent",
+                color: error ? "#ef4444" : "#111827",
+              }}
             />
-            <span className="text-gray-400 font-mono text-xl">/</span>
+            <span style={{ fontFamily: "monospace", fontSize: 22, color: "#9ca3af" }}>/</span>
             <input
-              type="text"
               value={flags}
-              onChange={(e) => setFlags(e.target.value)}
-              className="w-16 font-mono text-lg outline-none text-blue-600"
+              onChange={e => setFlags(e.target.value)}
+              style={{ width: 52, fontFamily: "monospace", fontSize: 18, border: "none", outline: "none", background: "transparent", color: "#185FA5" }}
             />
           </div>
-          {error && <p className="text-red-500 text-sm mt-1">⚠ {error}</p>}
-
-          {/* フレーバー・フラグ */}
-          <div className="flex gap-4 mt-3 flex-wrap">
-            <div className="flex gap-1">
-              {["javascript", "python", "go"].map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFlavor(f)}
-                  className={`px-3 py-1 rounded text-sm ${flavor === f ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600"}`}
-                >
-                  {f}
-                </button>
-              ))}
+          {error && (
+            <div style={{ fontSize: 12, color: "#dc2626", marginTop: 6, paddingLeft: 4, display: "flex", alignItems: "center", gap: 4 }}>
+              <span>⚠</span> {error}
             </div>
-            <div className="flex gap-1">
-              {["g", "i", "m", "s"].map((flag) => (
-                <button
-                  key={flag}
-                  onClick={() => setFlags(prev => prev.includes(flag) ? prev.replace(flag, "") : prev + flag)}
-                  className={`px-3 py-1 rounded text-sm font-mono ${flags.includes(flag) ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-600"}`}
-                >
-                  {flag}
-                </button>
-              ))}
-            </div>
+          )}
+          {/* フラグ */}
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10 }}>
+            <span style={{ fontSize: 11, color: "#9ca3af", marginRight: 2 }}>flags</span>
+            {["g", "i", "m", "s"].map(fl => (
+              <button key={fl} onClick={() => toggleFlag(fl)} style={{
+                padding: "3px 12px", borderRadius: 20, fontSize: 12,
+                fontFamily: "monospace", cursor: "pointer",
+                border: `1px solid ${flags.includes(fl) ? "#185FA5" : "#e5e7eb"}`,
+                background: flags.includes(fl) ? "#eff6ff" : "#ffffff",
+                color: flags.includes(fl) ? "#185FA5" : "#9ca3af",
+              }}>{fl}</button>
+            ))}
           </div>
         </div>
 
-        {/* テスト文字列 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="font-semibold text-gray-700">テスト文字列</h2>
-            <span className="text-sm text-gray-400">{matches.length} マッチ</span>
+        {/* ── サンプル（未入力時のみ） ── */}
+        {!pattern && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 8, letterSpacing: "0.06em", textTransform: "uppercase" }}>サンプルを試す</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {SAMPLES.map(s => (
+                <button key={s.label} onClick={() => { setPattern(s.pattern); setFlags(s.flags); setTestStr(s.test); }} style={{
+                  fontSize: 12, padding: "6px 14px", borderRadius: 7, cursor: "pointer",
+                  border: "1px solid #e5e7eb", background: "#ffffff", color: "#374151",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                }}>{s.label}</button>
+              ))}
+            </div>
           </div>
-          <div className="font-mono text-sm bg-gray-50 rounded-lg p-3 whitespace-pre-wrap leading-relaxed mb-2">
-            <HighlightedText text={testString} matches={matches} />
+        )}
+
+        {/* ── テスト文字列 ── */}
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 8, letterSpacing: "0.06em", textTransform: "uppercase" }}>テスト文字列</div>
+          <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: 10, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <div style={{ padding: "12px 16px", borderBottom: "1px solid #f3f4f6", minHeight: 52, lineHeight: 2, background: "#fafafa" }}>
+              <HighlightedText text={testStr} matches={matches} />
+            </div>
+            <textarea
+              value={testStr}
+              onChange={e => setTestStr(e.target.value)}
+              rows={3}
+              style={{
+                width: "100%", fontFamily: "monospace", fontSize: 13,
+                border: "none", outline: "none", padding: "10px 16px",
+                background: "#ffffff", color: "#374151",
+                resize: "vertical", boxSizing: "border-box", display: "block",
+              }}
+              placeholder="テスト文字列を入力..."
+            />
           </div>
-          <textarea
-            value={testString}
-            onChange={(e) => setTestString(e.target.value)}
-            rows={4}
-            className="w-full font-mono text-sm border border-gray-200 rounded-lg p-3 outline-none focus:border-blue-400"
-            placeholder="テスト文字列を入力..."
-          />
         </div>
 
-        {/* タブ：鉄道図 / マッチ結果 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="flex gap-2 mb-4">
-            {(["diagram", "matches"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded text-sm font-medium ${activeTab === tab ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600"}`}
-              >
-                {tab === "diagram" ? "🔵 鉄道図" : "✅ マッチ結果"}
+        {/* ── 鉄道図 / マッチ結果 ── */}
+        <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: 10, marginBottom: 24, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <div style={{ display: "flex", borderBottom: "1px solid #f3f4f6" }}>
+            {(["diagram", "matches"] as const).map(t => (
+              <button key={t} onClick={() => setTab(t)} style={{
+                flex: 1, padding: "11px 0", fontSize: 12, cursor: "pointer",
+                border: "none", background: "transparent",
+                borderBottom: `2px solid ${tab === t ? "#185FA5" : "transparent"}`,
+                color: tab === t ? "#185FA5" : "#9ca3af",
+                fontWeight: tab === t ? 600 : 400,
+              }}>
+                {t === "diagram" ? "鉄道図" : `マッチ結果${matches.length > 0 ? ` (${matches.length})` : ""}`}
               </button>
             ))}
           </div>
-
-          {activeTab === "diagram" && <RailroadDiagram pattern={pattern} />}
-
-          {activeTab === "matches" && (
-            <div>
-              {matches.length === 0 ? (
-                <p className="text-gray-400 text-sm">マッチなし</p>
-              ) : (
-                <div className="space-y-2">
-                  {matches.map((m, i) => (
-                    <div key={i} className="flex gap-4 bg-gray-50 rounded-lg p-3 font-mono text-sm">
-                      <span className="text-gray-400">#{i + 1}</span>
-                      <span className="text-blue-600 font-bold">"{m.value}"</span>
-                      <span className="text-gray-400">index: {m.index}–{m.end}</span>
-                      {m.groups && <span className="text-green-600">groups: {JSON.stringify(m.groups)}</span>}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          <div style={{ padding: "16px" }}>
+            {tab === "diagram" && <RailroadDiagram pattern={pattern} />}
+            {tab === "matches" && (
+              matches.length === 0
+                ? <div style={{ padding: "20px 0", textAlign: "center", fontSize: 13, color: "#9ca3af" }}>マッチなし</div>
+                : <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {matches.map((m, i) => (
+                      <div key={i} style={{
+                        display: "flex", gap: 12, alignItems: "center",
+                        background: "#f9fafb", borderRadius: 6, padding: "8px 12px",
+                        fontFamily: "monospace", fontSize: 12,
+                      }}>
+                        <span style={{ color: "#9ca3af", minWidth: 24 }}>#{i + 1}</span>
+                        <span style={{ color: "#185FA5", fontWeight: 600 }}>"{m.value}"</span>
+                        <span style={{ color: "#9ca3af", marginLeft: "auto" }}>{m.index}–{m.end}</span>
+                        {m.groups && <span style={{ color: "#166534" }}>{JSON.stringify(m.groups)}</span>}
+                      </div>
+                    ))}
+                  </div>
+            )}
+          </div>
         </div>
 
-        {/* コードスニペット */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h2 className="font-semibold text-gray-700 mb-2">コード例（{flavor}）</h2>
-          <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto">
-            {codeSnippets[flavor]}
+        {/* ── コード例 ── */}
+        <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: 10, marginBottom: 24, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <div style={{ padding: "10px 16px", borderBottom: "1px solid #f3f4f6", background: "#fafafa" }}>
+            <span style={{ fontSize: 12, color: "#6b7280" }}>コード例 — {flavor}</span>
+          </div>
+          <pre style={{ margin: 0, padding: "14px 16px", fontFamily: "monospace", fontSize: 12, background: "#1e1e2e", color: "#cdd6f4", overflowX: "auto", lineHeight: 1.8 }}>
+            {CODE[flavor](pattern, flags)}
           </pre>
         </div>
 
-        {/* 共有 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h2 className="font-semibold text-gray-700 mb-2">共有</h2>
-          <div className="flex gap-2">
-            <input
-              readOnly
-              value={shareUrl}
-              className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 font-mono"
-            />
-            <button
-              onClick={handleCopy}
-              className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
-            >
-              {copied ? <Check size={16} /> : <Copy size={16} />}
-              {copied ? "コピー済み" : "コピー"}
+        {/* ── 共有 ── */}
+        <div style={{ background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: 10, padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 8, letterSpacing: "0.06em", textTransform: "uppercase" }}>URLで共有</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input readOnly value={shareUrl} style={{
+              flex: 1, fontSize: 11, fontFamily: "monospace",
+              border: "1px solid #e5e7eb", borderRadius: 6, padding: "8px 10px",
+              background: "#f9fafb", color: "#9ca3af", outline: "none",
+            }} />
+            <button onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); }} style={{
+              padding: "8px 16px", borderRadius: 6, fontSize: 12, cursor: "pointer",
+              border: `1px solid ${copied ? "#16a34a" : "#e5e7eb"}`,
+              background: copied ? "#f0fdf4" : "#ffffff",
+              color: copied ? "#166534" : "#374151",
+              whiteSpace: "nowrap",
+            }}>
+              {copied ? "コピー済み ✓" : "コピー"}
             </button>
           </div>
+        </div>
+
+        {/* フッター */}
+        <div style={{ textAlign: "center", padding: "24px 0", borderTop: "1px solid #f3f4f6", marginTop: 8 }}>
+            <a href="/privacy" style={{ fontSize: 12, color: "#9ca3af", textDecoration: "none" }}>プライバシーポリシー</a>
         </div>
       </div>
     </div>

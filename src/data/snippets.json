@@ -88,5 +88,665 @@
       "python": "import re\npattern = re.compile(r'https?://(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&/=]*)')\nresult = pattern.findall(text)",
       "go": "import \"regexp\"\nre := regexp.MustCompile(`https?://(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&/=]*)`)\nresult := re.FindAllString(text, -1)"
     }
+  },
+  {
+    "slug": "kanji",
+    "lang": "ja",
+    "title": "漢字にマッチする正規表現",
+    "description": "日本語の漢字（CJK統合漢字）にマッチする正規表現パターンです。",
+    "pattern": "[\\u4E00-\\u9FFF]+",
+    "flags": "g",
+    "testString": "日本語のテスト。東京都渋谷区。漢字のみ抽出。",
+    "tags": ["日本語", "漢字", "文字クラス"],
+    "codeExamples": {
+      "javascript": "const regex = /[\\u4E00-\\u9FFF]+/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('[\\u4E00-\\u9FFF]+')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[\\x{4E00}-\\x{9FFF}]+`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "full-width-number",
+    "lang": "ja",
+    "title": "全角数字にマッチする正規表現",
+    "description": "全角数字（０〜９）にマッチする正規表現パターンです。",
+    "pattern": "[\\uFF10-\\uFF19]+",
+    "flags": "g",
+    "testString": "価格：１２３４５円、数量：６７８",
+    "tags": ["日本語", "全角", "数字"],
+    "codeExamples": {
+      "javascript": "const regex = /[\\uFF10-\\uFF19]+/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('[\\uFF10-\\uFF19]+')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[\\x{FF10}-\\x{FF19}]+`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "full-width-alpha",
+    "lang": "ja",
+    "title": "全角英字にマッチする正規表現",
+    "description": "全角アルファベット（Ａ〜Ｚ、ａ〜ｚ）にマッチする正規表現パターンです。",
+    "pattern": "[\\uFF21-\\uFF3A\\uFF41-\\uFF5A]+",
+    "flags": "g",
+    "testString": "ＡＢＣ東京ａｂｃ大阪ＸＹＺ",
+    "tags": ["日本語", "全角", "英字"],
+    "codeExamples": {
+      "javascript": "const regex = /[\\uFF21-\\uFF3A\\uFF41-\\uFF5A]+/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('[\\uFF21-\\uFF3A\\uFF41-\\uFF5A]+')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[\\x{FF21}-\\x{FF3A}\\x{FF41}-\\x{FF5A}]+`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "japanese-date",
+    "lang": "ja",
+    "title": "日本語の日付にマッチする正規表現",
+    "description": "YYYY年MM月DD日 形式の日付にマッチする正規表現です。",
+    "pattern": "\\d{4}年\\d{1,2}月\\d{1,2}日",
+    "flags": "g",
+    "testString": "2024年1月15日に東京で開催。2023年12月31日締切。",
+    "tags": ["日本語", "日付", "数字"],
+    "codeExamples": {
+      "javascript": "const regex = /\\d{4}年\\d{1,2}月\\d{1,2}日/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('\\\\d{4}年\\\\d{1,2}月\\\\d{1,2}日')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\d{4}年\\d{1,2}月\\d{1,2}日`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "japanese-address",
+    "lang": "ja",
+    "title": "都道府県にマッチする正規表現",
+    "description": "日本の都道府県名にマッチする正規表現パターンです。",
+    "pattern": "東京都|北海道|(?:大阪|京都)府|.{2,3}県",
+    "flags": "g",
+    "testString": "東京都渋谷区、大阪府大阪市、神奈川県横浜市、北海道札幌市",
+    "tags": ["日本語", "住所", "都道府県"],
+    "codeExamples": {
+      "javascript": "const regex = /東京都|北海道|(?:大阪|京都)府|.{2,3}県/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('東京都|北海道|(?:大阪|京都)府|.{2,3}県')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`東京都|北海道|(?:大阪|京都)府|.{2,3}県`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "japanese-name",
+    "lang": "ja",
+    "title": "日本人名（姓名）にマッチする正規表現",
+    "description": "漢字2〜4文字の日本人名にマッチする正規表現パターンです。",
+    "pattern": "[\\u4E00-\\u9FFF]{1,4}\\s[\\u4E00-\\u9FFF]{1,4}",
+    "flags": "g",
+    "testString": "田中 太郎、山田 花子、佐藤 次郎が出席しました。",
+    "tags": ["日本語", "人名", "漢字"],
+    "codeExamples": {
+      "javascript": "const regex = /[\\u4E00-\\u9FFF]{1,4}\\s[\\u4E00-\\u9FFF]{1,4}/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('[\\u4E00-\\u9FFF]{1,4}\\\\s[\\u4E00-\\u9FFF]{1,4}')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[\\x{4E00}-\\x{9FFF}]{1,4}\\s[\\x{4E00}-\\x{9FFF}]{1,4}`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "credit-card",
+    "lang": "en",
+    "title": "Credit Card Number Regex",
+    "description": "Matches major credit card numbers (Visa, Mastercard, Amex) with or without dashes.",
+    "pattern": "(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})",
+    "flags": "g",
+    "testString": "Visa: 4111111111111111, Amex: 371449635398431",
+    "tags": ["validation", "credit card", "payment"],
+    "codeExamples": {
+      "javascript": "const regex = /(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "ipv4",
+    "lang": "en",
+    "title": "IPv4 Address Regex",
+    "description": "Matches valid IPv4 addresses like 192.168.1.1.",
+    "pattern": "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b",
+    "flags": "g",
+    "testString": "Server: 192.168.1.1, Gateway: 10.0.0.1, DNS: 8.8.8.8",
+    "tags": ["network", "ip address", "validation"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "hex-color",
+    "lang": "en",
+    "title": "Hex Color Code Regex",
+    "description": "Matches CSS hex color codes like #fff or #ffffff.",
+    "pattern": "#(?:[0-9a-fA-F]{3}){1,2}\\b",
+    "flags": "g",
+    "testString": "Colors: #fff, #000000, #FF5733, #abc, #1a2b3c",
+    "tags": ["css", "color", "hex"],
+    "codeExamples": {
+      "javascript": "const regex = /#(?:[0-9a-fA-F]{3}){1,2}\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'#(?:[0-9a-fA-F]{3}){1,2}\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`#(?:[0-9a-fA-F]{3}){1,2}\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "slug",
+    "lang": "en",
+    "title": "URL Slug Regex",
+    "description": "Matches URL-friendly slugs using lowercase letters, numbers, and hyphens.",
+    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+    "flags": "",
+    "testString": "my-blog-post\nhello-world-123\nInvalid Slug\nanother-valid-slug",
+    "tags": ["url", "slug", "validation"],
+    "codeExamples": {
+      "javascript": "const regex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;\nconst isValid = regex.test(str);",
+      "python": "import re\npattern = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')\nis_valid = bool(pattern.match(text))",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)\nisValid := re.MatchString(text)"
+    }
+  },
+  {
+    "slug": "password-strength",
+    "lang": "en",
+    "title": "Strong Password Regex",
+    "description": "Matches passwords with at least 8 chars, uppercase, lowercase, number, and special character.",
+    "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+    "flags": "",
+    "testString": "WeakPass\nStr0ng@Pass\nAnother#Good1\ntooshort1A@",
+    "tags": ["password", "security", "validation"],
+    "codeExamples": {
+      "javascript": "const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/;\nconst isStrong = regex.test(password);",
+      "python": "import re\npattern = re.compile(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$')\nis_strong = bool(pattern.match(password))",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$`)\nisStrong := re.MatchString(password)"
+    }
+  },
+  {
+    "slug": "semantic-version",
+    "lang": "en",
+    "title": "Semantic Version Regex",
+    "description": "Matches semantic versioning strings like 1.0.0 or 2.3.1-beta.",
+    "pattern": "\\bv?(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[\\w.-]+)?\\b",
+    "flags": "g",
+    "testString": "Released v1.0.0, Updated to 2.3.1-beta, Hotfix 1.2.3-rc.1",
+    "tags": ["version", "semver", "development"],
+    "codeExamples": {
+      "javascript": "const regex = /\\bv?(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[\\w.-]+)?\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\bv?(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[\\w.-]+)?\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\bv?(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[\\w.-]+)?\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "jwt-token",
+    "lang": "en",
+    "title": "JWT Token Regex",
+    "description": "Matches JSON Web Tokens (three base64url segments separated by dots).",
+    "pattern": "eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+",
+    "flags": "g",
+    "testString": "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIn0.abc123xyz",
+    "tags": ["jwt", "auth", "token"],
+    "codeExamples": {
+      "javascript": "const regex = /eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "markdown-link",
+    "lang": "en",
+    "title": "Markdown Link Regex",
+    "description": "Matches Markdown hyperlinks in [text](url) format.",
+    "pattern": "\\[([^\\]]+)\\]\\((https?://[^)]+)\\)",
+    "flags": "g",
+    "testString": "Check out [Google](https://google.com) and [GitHub](https://github.com).",
+    "tags": ["markdown", "link", "parsing"],
+    "codeExamples": {
+      "javascript": "const regex = /\\[([^\\]]+)\\]\\((https?:\\/\\/[^)]+)\\)/g;\nconst result = [...str.matchAll(regex)];",
+      "python": "import re\npattern = re.compile(r'\\[([^\\]]+)\\]\\((https?://[^)]+)\\)')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\[([^\\]]+)\\]\\((https?://[^)]+)\\)`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "html-tag",
+    "lang": "en",
+    "title": "HTML Tag Regex",
+    "description": "Matches HTML opening and closing tags.",
+    "pattern": "<\\/?[a-zA-Z][a-zA-Z0-9]*(?:\\s[^>]*)?>",
+    "flags": "g",
+    "testString": "<div class=\"container\"><p>Hello</p><br/></div>",
+    "tags": ["html", "parsing", "web"],
+    "codeExamples": {
+      "javascript": "const regex = /<\\/?[a-zA-Z][a-zA-Z0-9]*(?:\\s[^>]*)?>\\g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'<\\/?[a-zA-Z][a-zA-Z0-9]*(?:\\s[^>]*)?>')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`<\\/?[a-zA-Z][a-zA-Z0-9]*(?:\\s[^>]*)?>`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "date-iso",
+    "lang": "en",
+    "title": "ISO 8601 Date Regex",
+    "description": "Matches ISO 8601 date format: YYYY-MM-DD.",
+    "pattern": "\\b\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])\\b",
+    "flags": "g",
+    "testString": "Event on 2024-01-15, deadline 2024-12-31, invalid: 2024-13-01",
+    "tags": ["date", "iso", "validation"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\b\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "time-format",
+    "lang": "en",
+    "title": "Time Format Regex (HH:MM)",
+    "description": "Matches 24-hour time format like 09:30 or 23:59.",
+    "pattern": "\\b([01]\\d|2[0-3]):([0-5]\\d)\\b",
+    "flags": "g",
+    "testString": "Meeting at 09:30, lunch 12:00, standup 23:59, invalid 25:00",
+    "tags": ["time", "validation", "format"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b([01]\\d|2[0-3]):([0-5]\\d)\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b([01]\\d|2[0-3]):([0-5]\\d)\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\b([01]\\d|2[0-3]):([0-5]\\d)\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "file-extension",
+    "lang": "en",
+    "title": "File Extension Regex",
+    "description": "Matches common file extensions like .jpg, .png, .pdf, .js.",
+    "pattern": "\\.(jpe?g|png|gif|webp|pdf|docx?|xlsx?|txt|csv|json|js|ts|py|go|rs)\\b",
+    "flags": "gi",
+    "testString": "Files: image.jpg, doc.pdf, script.js, data.json, photo.PNG",
+    "tags": ["file", "extension", "validation"],
+    "codeExamples": {
+      "javascript": "const regex = /\\.(jpe?g|png|gif|webp|pdf|docx?|xlsx?|txt|csv|json|js|ts|py|go|rs)\\b/gi;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\.(jpe?g|png|gif|webp|pdf|docx?|xlsx?|txt|csv|json|js|ts|py|go|rs)\\b', re.IGNORECASE)\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?i)\\.(jpe?g|png|gif|webp|pdf|docx?|xlsx?|txt|csv|json|js|ts|py|go|rs)\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "git-commit-hash",
+    "lang": "en",
+    "title": "Git Commit Hash Regex",
+    "description": "Matches full (40-char) or short (7-char) Git commit hashes.",
+    "pattern": "\\b[0-9a-f]{7,40}\\b",
+    "flags": "g",
+    "testString": "Commit a1b2c3d fixed bug. Full hash: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+    "tags": ["git", "hash", "development"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b[0-9a-f]{7,40}\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b[0-9a-f]{7,40}\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\b[0-9a-f]{7,40}\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "log-level",
+    "lang": "en",
+    "title": "Log Level Regex",
+    "description": "Matches common log levels: DEBUG, INFO, WARN, ERROR, FATAL.",
+    "pattern": "\\b(DEBUG|INFO|WARN(?:ING)?|ERROR|FATAL)\\b",
+    "flags": "g",
+    "testString": "[INFO] Server started. [ERROR] Connection failed. [DEBUG] Retrying. [FATAL] Crash.",
+    "tags": ["logging", "devops", "parsing"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b(DEBUG|INFO|WARN(?:ING)?|ERROR|FATAL)\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b(DEBUG|INFO|WARN(?:ING)?|ERROR|FATAL)\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\b(DEBUG|INFO|WARN(?:ING)?|ERROR|FATAL)\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "mac-address",
+    "lang": "en",
+    "title": "MAC Address Regex",
+    "description": "Matches MAC addresses in colon or hyphen notation.",
+    "pattern": "\\b([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\\b",
+    "flags": "g",
+    "testString": "Devices: 00:1A:2B:3C:4D:5E and 00-1A-2B-3C-4D-5E connected.",
+    "tags": ["network", "mac address", "hardware"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\b([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "us-phone",
+    "lang": "en",
+    "title": "US Phone Number Regex",
+    "description": "Matches US phone numbers in various formats.",
+    "pattern": "\\b(?:\\+1[-.\\s]?)?(?:\\(?[0-9]{3}\\)?[-.\\s]?)[0-9]{3}[-.\\s]?[0-9]{4}\\b",
+    "flags": "g",
+    "testString": "Call (555) 123-4567 or 555-123-4567 or +1 555.123.4567",
+    "tags": ["phone", "us", "validation"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b(?:\\+1[-.\\s]?)?(?:\\(?[0-9]{3}\\)?[-.\\s]?)[0-9]{3}[-.\\s]?[0-9]{4}\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b(?:\\+1[-.\\s]?)?(?:\\(?[0-9]{3}\\)?[-.\\s]?)[0-9]{3}[-.\\s]?[0-9]{4}\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\b(?:\\+1[-.\\s]?)?(?:\\(?[0-9]{3}\\)?[-.\\s]?)[0-9]{3}[-.\\s]?[0-9]{4}\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "uuid",
+    "lang": "en",
+    "title": "UUID Regex",
+    "description": "Matches UUID v4 format strings.",
+    "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+    "flags": "gi",
+    "testString": "User ID: 550e8400-e29b-41d4-a716-446655440000, Session: 6ba7b810-9dad-41d4-80b4-00c04fd430c8",
+    "tags": ["uuid", "id", "database"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b/gi;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b', re.IGNORECASE)\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?i)\\b[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "base64",
+    "lang": "en",
+    "title": "Base64 String Regex",
+    "description": "Matches Base64 encoded strings.",
+    "pattern": "\\b[A-Za-z0-9+/]{4}(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\\b",
+    "flags": "g",
+    "testString": "Encoded: SGVsbG8gV29ybGQ= and data: dGVzdA==",
+    "tags": ["base64", "encoding", "data"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b[A-Za-z0-9+/]{4}(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b[A-Za-z0-9+/]{4}(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\b[A-Za-z0-9+/]{4}(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "env-variable",
+    "lang": "en",
+    "title": "Environment Variable Regex",
+    "description": "Matches environment variable declarations like KEY=value.",
+    "pattern": "^([A-Z_][A-Z0-9_]*)=(.*)$",
+    "flags": "gm",
+    "testString": "DATABASE_URL=postgres://localhost/db\nAPI_KEY=abc123\nPORT=3000\ninvalid-key=value",
+    "tags": ["env", "config", "devops"],
+    "codeExamples": {
+      "javascript": "const regex = /^([A-Z_][A-Z0-9_]*)=(.*)$/gm;\nconst result = [...str.matchAll(regex)];",
+      "python": "import re\npattern = re.compile(r'^([A-Z_][A-Z0-9_]*)=(.*)$', re.MULTILINE)\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?m)^([A-Z_][A-Z0-9_]*)=(.*)$`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "twitter-mention",
+    "lang": "en",
+    "title": "Twitter / X Mention Regex",
+    "description": "Matches @username mentions in tweets or social posts.",
+    "pattern": "@([A-Za-z0-9_]{1,15})",
+    "flags": "g",
+    "testString": "Hello @john_doe, thanks @jane123! CC @support team.",
+    "tags": ["social", "twitter", "mention"],
+    "codeExamples": {
+      "javascript": "const regex = /@([A-Za-z0-9_]{1,15})/g;\nconst result = [...str.matchAll(regex)].map(m => m[1]);",
+      "python": "import re\npattern = re.compile(r'@([A-Za-z0-9_]{1,15})')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`@([A-Za-z0-9_]{1,15})`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "hashtag",
+    "lang": "en",
+    "title": "Hashtag Regex",
+    "description": "Matches hashtags used in social media posts.",
+    "pattern": "#([A-Za-z0-9_]+)",
+    "flags": "g",
+    "testString": "Loving #webdev and #JavaScript! Follow #coding #opensource",
+    "tags": ["social", "hashtag", "parsing"],
+    "codeExamples": {
+      "javascript": "const regex = /#([A-Za-z0-9_]+)/g;\nconst result = [...str.matchAll(regex)].map(m => m[1]);",
+      "python": "import re\npattern = re.compile(r'#([A-Za-z0-9_]+)')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`#([A-Za-z0-9_]+)`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "doi",
+    "lang": "en",
+    "title": "DOI (Academic Paper) Regex",
+    "description": "Matches Digital Object Identifiers used in academic publications.",
+    "pattern": "\\b10\\.\\d{4,9}/[-._;()/:A-Z0-9]+\\b",
+    "flags": "gi",
+    "testString": "See paper 10.1038/nature12373 and article doi:10.1126/science.1234567",
+    "tags": ["academic", "doi", "research"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b10\\.\\d{4,9}\\/[-._;()\\/:A-Z0-9]+\\b/gi;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b10\\.\\d{4,9}/[-._;()/:A-Z0-9]+\\b', re.IGNORECASE)\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?i)\\b10\\.\\d{4,9}/[-._;()/:A-Z0-9]+\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "sql-injection",
+    "lang": "en",
+    "title": "SQL Injection Pattern Regex",
+    "description": "Detects common SQL injection patterns for input validation.",
+    "pattern": "(?:'[^']*'|--|;|\\b(?:SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\\b)",
+    "flags": "gi",
+    "testString": "Normal input\n' OR '1'='1\nSELECT * FROM users; DROP TABLE users;--",
+    "tags": ["security", "sql", "validation"],
+    "codeExamples": {
+      "javascript": "const regex = /(?:'[^']*'|--|;|\\b(?:SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\\b)/gi;\nconst isSuspicious = regex.test(input);",
+      "python": "import re\npattern = re.compile(r\"(?:'[^']*'|--|;|\\b(?:SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\\b)\", re.IGNORECASE)\nis_suspicious = bool(pattern.search(input_text))",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?i)(?:'[^']*'|--|;|\\b(?:SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\\b)`)\nisSuspicious := re.MatchString(input)"
+    }
+  },
+  {
+    "slug": "camel-case",
+    "lang": "en",
+    "title": "camelCase to snake_case Regex",
+    "description": "Matches uppercase letters in camelCase for conversion to snake_case.",
+    "pattern": "([A-Z])",
+    "flags": "g",
+    "testString": "myVariableName\ngetUserById\nfetchAllProducts",
+    "tags": ["string", "naming", "conversion"],
+    "codeExamples": {
+      "javascript": "const toSnakeCase = str => str.replace(/([A-Z])/g, '_$1').toLowerCase();",
+      "python": "import re\ndef to_snake_case(s):\n    return re.sub('([A-Z])', r'_\\1', s).lower()",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`([A-Z])`)\nsnake := strings.ToLower(re.ReplaceAllString(camel, `_$1`))"
+    }
+  },
+  {
+    "slug": "between-tags",
+    "lang": "en",
+    "title": "Content Between HTML Tags Regex",
+    "description": "Extracts text content between opening and closing HTML tags.",
+    "pattern": "<(\\w+)[^>]*>([^<]+)<\\/\\1>",
+    "flags": "g",
+    "testString": "<h1>Hello World</h1>\n<p>This is a paragraph.</p>\n<span class=\"name\">John</span>",
+    "tags": ["html", "parsing", "extraction"],
+    "codeExamples": {
+      "javascript": "const regex = /<(\\w+)[^>]*>([^<]+)<\\/\\1>/g;\nconst result = [...str.matchAll(regex)].map(m => ({tag: m[1], content: m[2]}));",
+      "python": "import re\npattern = re.compile(r'<(\\w+)[^>]*>([^<]+)<\\/\\1>')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`<(\\w+)[^>]*>([^<]+)<\\/\\1>`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "repeated-words",
+    "lang": "en",
+    "title": "Repeated Words Regex",
+    "description": "Detects consecutive duplicate words in text.",
+    "pattern": "\\b(\\w+)\\s+\\1\\b",
+    "flags": "gi",
+    "testString": "This is is a test. The the quick brown fox fox jumped.",
+    "tags": ["text", "duplicate", "editing"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b(\\w+)\\s+\\1\\b/gi;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b(\\w+)\\s+\\1\\b', re.IGNORECASE)\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?i)\\b(\\w+)\\s+\\1\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "positive-lookahead",
+    "lang": "en",
+    "title": "Positive Lookahead Regex",
+    "description": "Matches words followed by a specific pattern using positive lookahead.",
+    "pattern": "\\w+(?=\\s+dollars)",
+    "flags": "gi",
+    "testString": "100 dollars, 200 euros, 50 dollars, 75 yen",
+    "tags": ["lookahead", "advanced", "tutorial"],
+    "codeExamples": {
+      "javascript": "const regex = /\\w+(?=\\s+dollars)/gi;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\w+(?=\\s+dollars)', re.IGNORECASE)\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?i)\\w+(?=\\s+dollars)`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "negative-lookahead",
+    "lang": "en",
+    "title": "Negative Lookahead Regex",
+    "description": "Matches words NOT followed by a specific pattern using negative lookahead.",
+    "pattern": "\\b\\d+(?!\\s*px)\\b",
+    "flags": "g",
+    "testString": "width: 100px, count: 42, height: 200px, items: 7",
+    "tags": ["lookahead", "advanced", "tutorial"],
+    "codeExamples": {
+      "javascript": "const regex = /\\b\\d+(?!\\s*px)\\b/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\b\\d+(?!\\s*px)\\b')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\b\\d+(?!\\s*px)\\b`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "named-group",
+    "lang": "en",
+    "title": "Named Capture Group Regex",
+    "description": "Uses named groups to extract year, month, day from a date string.",
+    "pattern": "(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})",
+    "flags": "g",
+    "testString": "Dates: 2024-01-15, 2023-12-31, 2025-06-01",
+    "tags": ["groups", "advanced", "tutorial"],
+    "codeExamples": {
+      "javascript": "const regex = /(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})/g;\nconst result = [...str.matchAll(regex)].map(m => m.groups);",
+      "python": "import re\npattern = re.compile(r'(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})')\nresult = [m.groupdict() for m in pattern.finditer(text)]",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "non-greedy",
+    "lang": "en",
+    "title": "Non-Greedy Match Regex",
+    "description": "Uses non-greedy quantifier to match the shortest possible string.",
+    "pattern": "<.+?>",
+    "flags": "g",
+    "testString": "<div><p>Hello</p><span>World</span></div>",
+    "tags": ["greedy", "advanced", "tutorial"],
+    "codeExamples": {
+      "javascript": "const regex = /<.+?>/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'<.+?>')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`<.+?>`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "multiline",
+    "lang": "en",
+    "title": "Multiline Mode Regex",
+    "description": "Uses multiline flag to match start/end of each line.",
+    "pattern": "^\\d+\\.\\s.+$",
+    "flags": "gm",
+    "testString": "1. First item\n2. Second item\nNot a list item\n3. Third item",
+    "tags": ["multiline", "flags", "tutorial"],
+    "codeExamples": {
+      "javascript": "const regex = /^\\d+\\.\\s.+$/gm;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'^\\d+\\.\\s.+$', re.MULTILINE)\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?m)^\\d+\\.\\s.+$`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "korean-characters",
+    "lang": "en",
+    "title": "Korean Characters Regex",
+    "description": "Matches Korean Hangul characters.",
+    "pattern": "[\\uAC00-\\uD7A3]+",
+    "flags": "g",
+    "testString": "Hello 안녕하세요 World 감사합니다 Test",
+    "tags": ["korean", "unicode", "international"],
+    "codeExamples": {
+      "javascript": "const regex = /[\\uAC00-\\uD7A3]+/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('[\\uAC00-\\uD7A3]+')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[\\x{AC00}-\\x{D7A3}]+`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "arabic-characters",
+    "lang": "en",
+    "title": "Arabic Characters Regex",
+    "description": "Matches Arabic script characters.",
+    "pattern": "[\\u0600-\\u06FF]+",
+    "flags": "g",
+    "testString": "Hello مرحبا World شكرا Test",
+    "tags": ["arabic", "unicode", "international"],
+    "codeExamples": {
+      "javascript": "const regex = /[\\u0600-\\u06FF]+/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('[\\u0600-\\u06FF]+')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[\\x{0600}-\\x{06FF}]+`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "whitespace-normalize",
+    "lang": "en",
+    "title": "Whitespace Normalization Regex",
+    "description": "Matches multiple consecutive whitespace characters for normalization.",
+    "pattern": "\\s{2,}",
+    "flags": "g",
+    "testString": "Hello   World\t\tFoo    Bar\n\n\nBaz",
+    "tags": ["whitespace", "cleanup", "string"],
+    "codeExamples": {
+      "javascript": "const normalized = str.replace(/\\s{2,}/g, ' ').trim();",
+      "python": "import re\nnormalized = re.sub(r'\\s{2,}', ' ', text).strip()",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\s{2,}`)\nnormalized := strings.TrimSpace(re.ReplaceAllString(text, \" \"))"
+    }
+  },
+  {
+    "slug": "empty-lines",
+    "lang": "en",
+    "title": "Empty Lines Regex",
+    "description": "Matches empty or whitespace-only lines for removal.",
+    "pattern": "^\\s*$",
+    "flags": "gm",
+    "testString": "Line 1\n\nLine 2\n   \nLine 3\n\n\nLine 4",
+    "tags": ["whitespace", "cleanup", "multiline"],
+    "codeExamples": {
+      "javascript": "const cleaned = str.replace(/^\\s*$/gm, '').replace(/\\n+/g, '\\n').trim();",
+      "python": "import re\ncleaned = re.sub(r'^\\s*$\\n', '', text, flags=re.MULTILINE).strip()",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?m)^\\s*$\\n`)\ncleaned := strings.TrimSpace(re.ReplaceAllString(text, \"\"))"
+    }
+  },
+  {
+    "slug": "phone-international",
+    "lang": "en",
+    "title": "International Phone Number Regex",
+    "description": "Matches international phone numbers with country codes.",
+    "pattern": "\\+?[1-9]\\d{0,2}[\\s.-]?(?:\\(\\d{1,4}\\)[\\s.-]?)?\\d{1,4}[\\s.-]?\\d{1,4}[\\s.-]?\\d{1,9}",
+    "flags": "g",
+    "testString": "+1-800-555-0100, +44 20 7946 0958, +81-3-1234-5678, +61 2 1234 5678",
+    "tags": ["phone", "international", "validation"],
+    "codeExamples": {
+      "javascript": "const regex = /\\+?[1-9]\\d{0,2}[\\s.-]?(?:\\(\\d{1,4}\\)[\\s.-]?)?\\d{1,4}[\\s.-]?\\d{1,4}[\\s.-]?\\d{1,9}/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'\\+?[1-9]\\d{0,2}[\\s.-]?(?:\\(\\d{1,4}\\)[\\s.-]?)?\\d{1,4}[\\s.-]?\\d{1,4}[\\s.-]?\\d{1,9}')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\+?[1-9]\\d{0,2}[\\s.-]?(?:\\(\\d{1,4}\\)[\\s.-]?)?\\d{1,4}[\\s.-]?\\d{1,4}[\\s.-]?\\d{1,9}`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "currency",
+    "lang": "en",
+    "title": "Currency Amount Regex",
+    "description": "Matches currency amounts with optional symbol and decimal.",
+    "pattern": "[$€£¥]\\s?\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})?",
+    "flags": "g",
+    "testString": "Price: $1,234.56, Tax: €89.99, Total: £2,000, JPY: ¥5000",
+    "tags": ["currency", "finance", "validation"],
+    "codeExamples": {
+      "javascript": "const regex = /[$€£¥]\\s?\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})?/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'[$€£¥]\\s?\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})?')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[$€£¥]\\s?\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})?`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "japanese-era",
+    "lang": "ja",
+    "title": "元号（令和・平成など）にマッチする正規表現",
+    "description": "日本の元号（令和・平成・昭和・大正・明治）と年数にマッチする正規表現です。",
+    "pattern": "(?:令和|平成|昭和|大正|明治)\\d{1,2}年",
+    "flags": "g",
+    "testString": "令和6年、平成31年、昭和64年、大正15年、明治45年",
+    "tags": ["日本語", "元号", "日付"],
+    "codeExamples": {
+      "javascript": "const regex = /(?:令和|平成|昭和|大正|明治)\\d{1,2}年/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('(?:令和|平成|昭和|大正|明治)\\\\d{1,2}年')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`(?:令和|平成|昭和|大正|明治)\\d{1,2}年`)\nresult := re.FindAllString(text, -1)"
+    }
   }
 ]
