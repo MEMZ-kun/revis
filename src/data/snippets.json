@@ -1,0 +1,92 @@
+[
+  {
+    "slug": "hiragana",
+    "lang": "ja",
+    "title": "ひらがなにマッチする正規表現",
+    "description": "日本語のひらがな（あ〜ん）にマッチする正規表現パターンです。",
+    "pattern": "[\\u3041-\\u3096]",
+    "flags": "g",
+    "testString": "今日はいい天気ですね。あいうえお",
+    "tags": ["日本語", "ひらがな", "文字クラス"],
+    "codeExamples": {
+      "javascript": "const regex = /[\\u3041-\\u3096]/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('[\\u3041-\\u3096]')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[\\x{3041}-\\x{3096}]`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "katakana",
+    "lang": "ja",
+    "title": "カタカナにマッチする正規表現",
+    "description": "日本語のカタカナ（ア〜ン）にマッチする正規表現パターンです。",
+    "pattern": "[\\u30A1-\\u30FA]",
+    "flags": "g",
+    "testString": "コンピューター、スマートフォン、インターネット",
+    "tags": ["日本語", "カタカナ", "文字クラス"],
+    "codeExamples": {
+      "javascript": "const regex = /[\\u30A1-\\u30FA]/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('[\\u30A1-\\u30FA]')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[\\x{30A1}-\\x{30FA}]`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "zip-code-japan",
+    "lang": "ja",
+    "title": "日本の郵便番号にマッチする正規表現",
+    "description": "日本の郵便番号（例：123-4567）にマッチする正規表現です。",
+    "pattern": "\\d{3}-\\d{4}",
+    "flags": "g",
+    "testString": "東京都渋谷区 150-0001、大阪府大阪市 530-0001",
+    "tags": ["日本語", "郵便番号", "数字"],
+    "codeExamples": {
+      "javascript": "const regex = /\\d{3}-\\d{4}/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('\\\\d{3}-\\\\d{4}')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`\\d{3}-\\d{4}`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "phone-japan",
+    "lang": "ja",
+    "title": "日本の電話番号にマッチする正規表現",
+    "description": "日本の電話番号（例：090-1234-5678）にマッチする正規表現です。",
+    "pattern": "0\\d{1,4}-\\d{1,4}-\\d{4}",
+    "flags": "g",
+    "testString": "連絡先：090-1234-5678、03-1234-5678",
+    "tags": ["日本語", "電話番号", "数字"],
+    "codeExamples": {
+      "javascript": "const regex = /0\\d{1,4}-\\d{1,4}-\\d{4}/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile('0\\\\d{1,4}-\\\\d{1,4}-\\\\d{4}')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`0\\d{1,4}-\\d{1,4}-\\d{4}`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "email",
+    "lang": "en",
+    "title": "Email Address Regex",
+    "description": "Matches standard email addresses like user@example.com.",
+    "pattern": "[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}",
+    "flags": "g",
+    "testString": "Contact us at hello@example.com or support@revis.dev",
+    "tags": ["email", "validation", "common"],
+    "codeExamples": {
+      "javascript": "const regex = /[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}`)\nresult := re.FindAllString(text, -1)"
+    }
+  },
+  {
+    "slug": "url",
+    "lang": "en",
+    "title": "URL Regex",
+    "description": "Matches http and https URLs.",
+    "pattern": "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)",
+    "flags": "g",
+    "testString": "Visit https://example.com or http://www.test.org/path?q=1",
+    "tags": ["url", "validation", "common"],
+    "codeExamples": {
+      "javascript": "const regex = /https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)/g;\nconst result = str.match(regex);",
+      "python": "import re\npattern = re.compile(r'https?://(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&/=]*)')\nresult = pattern.findall(text)",
+      "go": "import \"regexp\"\nre := regexp.MustCompile(`https?://(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&/=]*)`)\nresult := re.FindAllString(text, -1)"
+    }
+  }
+]
